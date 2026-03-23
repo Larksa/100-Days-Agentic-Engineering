@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2: Tip Calculator</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: #e94560; }
+  .header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+  .card { background: #16213e; border: 2px solid #0f3460; border-radius: 12px; padding: 2rem; width: 100%; max-width: 420px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #0f3460; }
+  .row:last-child { border-bottom: none; }
+  .label { color: #888; }
+  .value { font-size: 1.4rem; font-weight: bold; color: #53d769; min-width: 100px; text-align: right; }
+  .result-row { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e94560 !important; border-bottom: none !important; }
+  .result-row .value { color: #e94560; font-size: 1.6rem; }
+  @keyframes highlight { 0% { background: transparent; } 50% { background: rgba(233,69,96,0.2); } 100% { background: transparent; } }
+  .highlight { animation: highlight 0.8s ease; border-radius: 6px; }
+  .footer { margin-top: auto; color: #888; font-size: 0.85rem; text-align: center; padding-top: 2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Day 2: Tip Calculator</h1>
+    <p>100 Days of Agentic Engineering</p>
+  </div>
+  <div class="card">
+    <div class="row" id="r-bill"><span class="label">Bill Total</span><span class="value" id="v-bill">$0.00</span></div>
+    <div class="row" id="r-tip"><span class="label">Tip</span><span class="value" id="v-tip">0%</span></div>
+    <div class="row" id="r-ppl"><span class="label">Split Between</span><span class="value" id="v-ppl">0</span></div>
+    <div class="row result-row" id="r-res"><span class="label">Each Pays</span><span class="value" id="v-res">$0.00</span></div>
+  </div>
+  <div class="footer">Ready to build this? Go back to Claude Code and let's start!</div>
+<script>
+  const scenarios = [
+    { bill: 85.50, tip: 15, ppl: 3, each: 32.78 },
+    { bill: 124.00, tip: 20, ppl: 4, each: 37.20 },
+    { bill: 42.75, tip: 10, ppl: 2, each: 23.51 }
+  ];
+  let si = 0;
+  function tick(el, prefix, suffix, target, decimals, duration, cb) {
+    const steps = 30, interval = duration / steps;
+    let step = 0;
+    const iv = setInterval(() => {
+      step++;
+      const val = (target * step / steps);
+      el.textContent = prefix + val.toFixed(decimals) + suffix;
+      if (step >= steps) { clearInterval(iv); el.textContent = prefix + target.toFixed(decimals) + suffix; cb && cb(); }
+    }, interval);
+  }
+  function runScenario() {
+    const s = scenarios[si % scenarios.length];
+    const vBill = document.getElementById("v-bill"), vTip = document.getElementById("v-tip");
+    const vPpl = document.getElementById("v-ppl"), vRes = document.getElementById("v-res");
+    vBill.textContent = "$0.00"; vTip.textContent = "0%"; vPpl.textContent = "0"; vRes.textContent = "$0.00";
+    setTimeout(() => {
+      document.getElementById("r-bill").classList.add("highlight");
+      tick(vBill, "$", "", s.bill, 2, 800, () => {
+        setTimeout(() => {
+          document.getElementById("r-tip").classList.add("highlight");
+          tick(vTip, "", "%", s.tip, 0, 500, () => {
+            setTimeout(() => {
+              document.getElementById("r-ppl").classList.add("highlight");
+              vPpl.textContent = s.ppl;
+              setTimeout(() => {
+                document.getElementById("r-res").classList.add("highlight");
+                tick(vRes, "$", "", s.each, 2, 1000);
+              }, 500);
+            }, 400);
+          });
+        }, 400);
+      });
+    }, 300);
+    document.querySelectorAll(".row").forEach(r => r.classList.remove("highlight"));
+    si++;
+    setTimeout(runScenario, 5000);
+  }
+  runScenario();
+</script>
+</body>
+</html>

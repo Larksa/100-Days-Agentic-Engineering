@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1: Band Name Generator</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: #e94560; }
+  .header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+  .terminal { background: #16213e; border: 2px solid #0f3460; border-radius: 10px; padding: 1.5rem; width: 100%; max-width: 520px; min-height: 220px; margin-bottom: 1.5rem; }
+  .prompt { margin-bottom: 1rem; opacity: 0; }
+  .prompt .label { color: #53d769; }
+  .prompt .answer { color: #e94560; }
+  .cursor { display: inline-block; width: 8px; height: 1.1em; background: #e94560; vertical-align: text-bottom; animation: blink 0.6s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .band-name { text-align: center; font-size: clamp(1.8rem, 6vw, 3rem); font-weight: bold; color: #e94560; opacity: 0; text-shadow: 0 0 10px #e94560, 0 0 30px #e94560; margin: 1rem 0; }
+  @keyframes glow { 0% { opacity: 0; transform: scale(0.8); } 50% { opacity: 1; text-shadow: 0 0 20px #e94560, 0 0 60px #e94560, 0 0 100px #e94560; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+  .show { opacity: 1; }
+  .glow { animation: glow 1s ease-out forwards; }
+  .footer { margin-top: auto; color: #888; font-size: 0.85rem; text-align: center; padding-top: 2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Day 1: Band Name Generator</h1>
+    <p>100 Days of Agentic Engineering</p>
+  </div>
+  <div class="terminal" id="terminal">
+    <div class="prompt" id="p1"><span class="label">>>> Your city? </span><span class="answer" id="a1"></span><span class="cursor" id="c1"></span></div>
+    <div class="prompt" id="p2"><span class="label">>>> Your pet's name? </span><span class="answer" id="a2"></span><span class="cursor" id="c2" style="display:none"></span></div>
+  </div>
+  <div class="band-name" id="result"></div>
+  <div class="footer">Ready to build this? Go back to Claude Code and let's start!</div>
+<script>
+  const combos = [["Melbourne","Biscuit"],["Tokyo","Whiskers"],["Berlin","Nugget"]];
+  let round = 0;
+  function typeText(el, text, speed, cb) {
+    let i = 0;
+    el.textContent = "";
+    const iv = setInterval(() => { el.textContent += text[i++]; if (i >= text.length) { clearInterval(iv); cb && cb(); } }, speed);
+  }
+  function runRound() {
+    const [city, pet] = combos[round % combos.length];
+    const p1 = document.getElementById("p1"), p2 = document.getElementById("p2");
+    const a1 = document.getElementById("a1"), a2 = document.getElementById("a2");
+    const c1 = document.getElementById("c1"), c2 = document.getElementById("c2");
+    const res = document.getElementById("result");
+    p1.classList.remove("show"); p2.classList.remove("show");
+    res.classList.remove("glow"); res.textContent = ""; a1.textContent = ""; a2.textContent = "";
+    c1.style.display = "inline-block"; c2.style.display = "none";
+    setTimeout(() => {
+      p1.classList.add("show");
+      typeText(a1, city, 100, () => {
+        c1.style.display = "none";
+        setTimeout(() => {
+          p2.classList.add("show"); c2.style.display = "inline-block";
+          typeText(a2, pet, 100, () => {
+            c2.style.display = "none";
+            setTimeout(() => { res.textContent = city + " " + pet; res.classList.add("glow"); }, 500);
+          });
+        }, 400);
+      });
+    }, 300);
+    round++;
+    setTimeout(runRound, 5500);
+  }
+  runRound();
+</script>
+</body>
+</html>

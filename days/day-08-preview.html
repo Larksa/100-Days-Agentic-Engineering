@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 8: Caesar Cipher</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  header { text-align: center; padding: 2rem 1rem 1rem; }
+  header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: #e94560; }
+  header p { color: #888; font-size: clamp(0.8rem, 2vw, 1rem); margin-top: 0.3rem; }
+  .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; width: 100%; overflow-x: auto; }
+  .label { font-size: clamp(0.7rem, 1.8vw, 0.9rem); color: #888; margin-bottom: 0.2rem; }
+  .text-row { font-size: clamp(1.2rem, 3vw, 2rem); letter-spacing: 0.1em; min-height: 1.5em; color: #53d769; font-weight: bold; }
+  .alpha-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 2px; }
+  .alpha-cell { width: clamp(18px, 3vw, 28px); height: clamp(24px, 3.5vw, 34px); display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 1.5vw, 0.9rem); background: #16213e; border: 1px solid #0f3460; border-radius: 3px; transition: background 0.3s, color 0.3s; }
+  .alpha-cell.highlight { background: #e94560; color: #fff; }
+  .shifted-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 2px; }
+  .shifted-cell { width: clamp(18px, 3vw, 28px); height: clamp(24px, 3.5vw, 34px); display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 1.5vw, 0.9rem); background: #0f3460; border: 1px solid #0f3460; border-radius: 3px; opacity: 0; transition: opacity 0.5s, background 0.3s, color 0.3s; }
+  .shifted-cell.visible { opacity: 1; }
+  .shifted-cell.highlight { background: #53d769; color: #1a1a2e; }
+  .connector { width: 100%; height: 40px; position: relative; }
+  .conn-line { position: absolute; width: 2px; background: #e94560; top: 0; height: 0; transition: height 0.4s; opacity: 0.7; }
+  .arrow-label { font-size: clamp(0.65rem, 1.5vw, 0.8rem); color: #e94560; text-align: center; margin: 0.3rem 0; }
+  .output-row { font-size: clamp(1.2rem, 3vw, 2rem); letter-spacing: 0.1em; min-height: 1.5em; color: #e94560; font-weight: bold; }
+  .phase-label { font-size: clamp(0.9rem, 2vw, 1.1rem); color: #f5a623; margin-bottom: 0.5rem; min-height: 1.5em; }
+  footer { text-align: center; padding: 1.5rem 1rem; color: #53d769; font-size: clamp(0.8rem, 2vw, 1rem); }
+</style>
+</head>
+<body>
+<header><h1>Day 8: Caesar Cipher</h1><p>100 Days of Agentic Engineering</p></header>
+<div class="stage">
+  <div class="phase-label" id="phase"></div>
+  <div class="label">Plain Text</div>
+  <div class="text-row" id="input"></div>
+  <div style="height:0.5rem"></div>
+  <div class="label">Original Alphabet</div>
+  <div class="alpha-row" id="alphaTop"></div>
+  <div class="arrow-label" id="shiftLabel"></div>
+  <div class="label">Shifted +3</div>
+  <div class="shifted-row" id="alphaBot"></div>
+  <div style="height:0.5rem"></div>
+  <div class="label">Cipher Text</div>
+  <div class="output-row" id="output"></div>
+</div>
+<footer>Ready to build this? Go back to Claude Code and let's start!</footer>
+<script>
+const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SHIFT = 3;
+const topRow = document.getElementById('alphaTop');
+const botRow = document.getElementById('alphaBot');
+const inputEl = document.getElementById('input');
+const outputEl = document.getElementById('output');
+const phaseEl = document.getElementById('phase');
+const shiftLabel = document.getElementById('shiftLabel');
+
+ABC.split('').forEach((c, i) => {
+  const t = document.createElement('div'); t.className = 'alpha-cell'; t.textContent = c; t.id = 'top' + i; topRow.appendChild(t);
+  const b = document.createElement('div'); b.className = 'shifted-cell'; b.textContent = ABC[(i + SHIFT) % 26]; b.id = 'bot' + i; botRow.appendChild(b);
+});
+
+function clearHighlights() {
+  document.querySelectorAll('.alpha-cell, .shifted-cell').forEach(e => e.classList.remove('highlight'));
+}
+
+function encode(word, cb) {
+  phaseEl.textContent = 'Encoding...';
+  inputEl.textContent = word;
+  outputEl.textContent = '';
+  shiftLabel.textContent = '\u2193 shift +3 \u2193';
+  // Slide in shifted row
+  document.querySelectorAll('.shifted-cell').forEach((c, i) => { setTimeout(() => c.classList.add('visible'), i * 30); });
+  const startT = 26 * 30 + 600;
+  let result = '';
+  word.split('').forEach((ch, i) => {
+    setTimeout(() => {
+      clearHighlights();
+      const idx = ABC.indexOf(ch);
+      if (idx >= 0) {
+        document.getElementById('top' + idx).classList.add('highlight');
+        document.getElementById('bot' + idx).classList.add('highlight');
+        result += ABC[(idx + SHIFT) % 26];
+      } else { result += ch; }
+      outputEl.textContent = result;
+    }, startT + i * 800);
+  });
+  setTimeout(() => { clearHighlights(); if (cb) cb(); }, startT + word.length * 800 + 600);
+}
+
+function decode(cipher, cb) {
+  phaseEl.textContent = 'Decoding...';
+  inputEl.textContent = cipher;
+  outputEl.textContent = '';
+  shiftLabel.textContent = '\u2191 shift -3 \u2191';
+  let result = '';
+  cipher.split('').forEach((ch, i) => {
+    setTimeout(() => {
+      clearHighlights();
+      const idx = ABC.indexOf(ch);
+      if (idx >= 0) {
+        document.getElementById('bot' + idx).classList.add('highlight');
+        const origIdx = (idx - SHIFT + 26) % 26;
+        // find which top cell maps to this
+        // top[origIdx] -> bot[origIdx] = ABC[(origIdx+3)%26], we want top cell whose shifted = ch
+        // shifted row at position j = ABC[(j+3)%26], so ch = ABC[(j+3)%26], j = (idx_of_ch - 3 + 26)%26
+        const topIdx = (idx - SHIFT + 26) % 26;
+        document.getElementById('top' + topIdx).classList.add('highlight');
+        result += ABC[topIdx];
+      } else { result += ch; }
+      outputEl.textContent = result;
+    }, i * 800);
+  });
+  setTimeout(() => { clearHighlights(); if (cb) cb(); }, cipher.length * 800 + 600);
+}
+
+function runCycle() {
+  // Reset
+  document.querySelectorAll('.shifted-cell').forEach(c => c.classList.remove('visible'));
+  inputEl.textContent = ''; outputEl.textContent = ''; phaseEl.textContent = ''; shiftLabel.textContent = '';
+  clearHighlights();
+  setTimeout(() => {
+    encode('HELLO', () => {
+      setTimeout(() => decode('KHOOR', () => {
+        phaseEl.textContent = 'HELLO \u2194 KHOOR';
+        setTimeout(runCycle, 3000);
+      }), 1200);
+    });
+  }, 500);
+}
+setTimeout(runCycle, 600);
+</script>
+</body>
+</html>

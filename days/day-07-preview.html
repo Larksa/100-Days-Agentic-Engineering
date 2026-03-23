@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7: Hangman</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  header { text-align: center; padding: 2rem 1rem 1rem; }
+  header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: #e94560; }
+  header p { color: #888; font-size: clamp(0.8rem, 2vw, 1rem); margin-top: 0.3rem; }
+  .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 1rem; }
+  .gallows { width: 160px; height: 200px; position: relative; }
+  .g-part { position: absolute; background: #eee; opacity: 0; transition: opacity 0.5s; }
+  .g-base { bottom: 0; left: 10px; width: 120px; height: 4px; }
+  .g-pole { bottom: 0; left: 30px; width: 4px; height: 180px; }
+  .g-top { top: 0; left: 30px; width: 80px; height: 4px; }
+  .g-rope { top: 4px; left: 106px; width: 3px; height: 30px; }
+  /* Body parts */
+  .b-part { position: absolute; opacity: 0; transition: opacity 0.4s; }
+  .b-head { top: 34px; left: 95px; width: 24px; height: 24px; border: 3px solid #e94560; border-radius: 50%; }
+  .b-body { top: 58px; left: 105px; width: 3px; height: 35px; background: #e94560; }
+  .b-la { top: 65px; left: 85px; width: 20px; height: 3px; background: #e94560; transform: rotate(30deg); }
+  .b-ra { top: 65px; left: 108px; width: 20px; height: 3px; background: #e94560; transform: rotate(-30deg); }
+  .b-ll { top: 93px; left: 93px; width: 3px; height: 25px; background: #e94560; transform: rotate(20deg); }
+  .b-rl { top: 93px; left: 113px; width: 3px; height: 25px; background: #e94560; transform: rotate(-20deg); }
+  .word { display: flex; gap: clamp(0.5rem, 2vw, 1rem); font-size: clamp(1.8rem, 5vw, 3rem); }
+  .letter { width: 1.5em; text-align: center; border-bottom: 3px solid #0f3460; min-height: 1.5em; transition: color 0.3s; }
+  .letter.found { color: #53d769; border-color: #53d769; }
+  .guess-log { font-size: clamp(0.9rem, 2.5vw, 1.2rem); min-height: 2em; text-align: center; }
+  .flash-green { animation: flashG 0.5s; } .flash-red { animation: flashR 0.5s; }
+  @keyframes flashG { 0%,100% { color: #eee; } 50% { color: #53d769; text-shadow: 0 0 15px #53d769; } }
+  @keyframes flashR { 0%,100% { color: #eee; } 50% { color: #e94560; text-shadow: 0 0 15px #e94560; } }
+  .win { font-size: clamp(1.5rem, 4vw, 2.5rem); color: #53d769; opacity: 0; transition: opacity 0.6s; }
+  footer { text-align: center; padding: 1.5rem 1rem; color: #53d769; font-size: clamp(0.8rem, 2vw, 1rem); }
+</style>
+</head>
+<body>
+<header><h1>Day 7: Hangman</h1><p>100 Days of Agentic Engineering</p></header>
+<div class="stage">
+  <div class="gallows">
+    <div class="g-part g-base" id="gb"></div>
+    <div class="g-part g-pole" id="gp"></div>
+    <div class="g-part g-top" id="gt"></div>
+    <div class="g-part g-rope" id="gr"></div>
+    <div class="b-part b-head" id="bh"></div>
+    <div class="b-part b-body" id="bb"></div>
+    <div class="b-part b-la" id="bla"></div>
+    <div class="b-part b-ra" id="bra"></div>
+    <div class="b-part b-ll" id="bll"></div>
+    <div class="b-part b-rl" id="brl"></div>
+  </div>
+  <div class="word" id="word"></div>
+  <div class="guess-log" id="guessLog"></div>
+  <div class="win" id="win">&#127881; You Win! &#127881;</div>
+</div>
+<footer>Ready to build this? Go back to Claude Code and let's start!</footer>
+<script>
+const word = 'PYTHON';
+const guesses = [
+  { ch: 'P', hit: true },
+  { ch: 'X', hit: false },
+  { ch: 'Y', hit: true },
+  { ch: 'T', hit: true },
+  { ch: 'H', hit: true },
+  { ch: 'O', hit: true },
+  { ch: 'N', hit: true },
+];
+const bodyParts = ['bh','bb','bla','bra','bll','brl'];
+const gallowsParts = ['gb','gp','gt','gr'];
+const wordEl = document.getElementById('word');
+const guessLog = document.getElementById('guessLog');
+const winEl = document.getElementById('win');
+
+function reset() {
+  wordEl.innerHTML = '';
+  word.split('').forEach(() => { const d = document.createElement('div'); d.className = 'letter'; d.textContent = '\u00A0'; wordEl.appendChild(d); });
+  gallowsParts.forEach(id => document.getElementById(id).style.opacity = '0');
+  bodyParts.forEach(id => document.getElementById(id).style.opacity = '0');
+  winEl.style.opacity = '0';
+  guessLog.textContent = '';
+}
+
+function runGame() {
+  reset();
+  // Draw gallows first
+  gallowsParts.forEach((id, i) => { setTimeout(() => document.getElementById(id).style.opacity = '1', i * 400); });
+  const startT = gallowsParts.length * 400 + 500;
+  let wrongCount = 0;
+  guesses.forEach((g, i) => {
+    setTimeout(() => {
+      guessLog.textContent = 'Guessing: ' + g.ch;
+      guessLog.className = 'guess-log ' + (g.hit ? 'flash-green' : 'flash-red');
+      if (g.hit) {
+        word.split('').forEach((c, j) => {
+          if (c === g.ch) { const el = wordEl.children[j]; el.textContent = c; el.className = 'letter found'; }
+        });
+      } else {
+        if (wrongCount < bodyParts.length) document.getElementById(bodyParts[wrongCount]).style.opacity = '1';
+        wrongCount++;
+      }
+    }, startT + i * 1100);
+  });
+  setTimeout(() => { guessLog.textContent = ''; winEl.style.opacity = '1'; }, startT + guesses.length * 1100 + 300);
+  setTimeout(runGame, startT + guesses.length * 1100 + 3500);
+}
+setTimeout(runGame, 500);
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6: Robot Simulator</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  header { text-align: center; padding: 2rem 1rem 1rem; }
+  header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: #e94560; }
+  header p { color: #888; font-size: clamp(0.8rem, 2vw, 1rem); margin-top: 0.3rem; }
+  .stage { flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: clamp(1rem, 4vw, 3rem); flex-wrap: wrap; padding: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(5, clamp(40px, 10vw, 60px)); grid-template-rows: repeat(5, clamp(40px, 10vw, 60px)); gap: 3px; }
+  .cell { background: #16213e; border: 1px solid #0f3460; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: clamp(1.2rem, 3vw, 1.8rem); position: relative; }
+  .robot { position: absolute; font-size: clamp(1.2rem, 3vw, 1.8rem); transition: top 0.6s ease, left 0.6s ease; }
+  .grid-wrap { position: relative; }
+  .console { background: #0d0d1a; border: 1px solid #0f3460; border-radius: 8px; padding: 1rem 1.5rem; min-width: 240px; max-width: 320px; }
+  .console h3 { color: #53d769; margin-bottom: 0.8rem; font-size: 0.9rem; }
+  .log-line { font-size: clamp(0.75rem, 2vw, 0.95rem); margin: 0.4rem 0; opacity: 0; transition: opacity 0.3s; color: #888; }
+  .log-line.active { color: #53d769; opacity: 1; }
+  .log-line.past { color: #555; opacity: 1; }
+  .dir { font-size: 0.7rem; color: #e94560; position: absolute; bottom: 2px; right: 4px; }
+  footer { text-align: center; padding: 1.5rem 1rem; color: #53d769; font-size: clamp(0.8rem, 2vw, 1rem); }
+</style>
+</head>
+<body>
+<header><h1>Day 6: Functions / Robot Simulator</h1><p>100 Days of Agentic Engineering</p></header>
+<div class="stage">
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="console">
+    <h3>&gt; Function Calls</h3>
+    <div id="log"></div>
+  </div>
+</div>
+<footer>Ready to build this? Go back to Claude Code and let's start!</footer>
+<script>
+const grid = document.getElementById('grid');
+const log = document.getElementById('log');
+for (let i = 0; i < 25; i++) { const c = document.createElement('div'); c.className = 'cell'; c.id = 'c' + i; grid.appendChild(c); }
+const dirs = ['right','down','left','up'];
+const arrows = ['\u2192','\u2193','\u2190','\u2191'];
+const commands = [
+  { text: 'move_forward()', action: 'move' },
+  { text: 'move_forward()', action: 'move' },
+  { text: 'turn_right()', action: 'turn' },
+  { text: 'move_forward()', action: 'move' },
+  { text: 'move_forward()', action: 'move' },
+  { text: 'turn_right()', action: 'turn' },
+  { text: 'move_forward()', action: 'move' },
+];
+let rx = 0, ry = 0, dirIdx = 0;
+const deltas = [[1,0],[0,1],[-1,0],[0,-1]];
+
+function placeRobot() {
+  for (const c of document.querySelectorAll('.cell')) c.innerHTML = '';
+  const cell = document.getElementById('c' + (ry * 5 + rx));
+  cell.innerHTML = '<span style="font-size:inherit">&#x1F916;</span><span class="dir">' + arrows[dirIdx] + '</span>';
+}
+
+// Build log lines
+commands.forEach((cmd, i) => {
+  const d = document.createElement('div');
+  d.className = 'log-line'; d.id = 'log' + i;
+  d.textContent = cmd.text;
+  log.appendChild(d);
+});
+
+function runSequence() {
+  rx = 0; ry = 0; dirIdx = 0;
+  document.querySelectorAll('.log-line').forEach(l => { l.className = 'log-line'; });
+  placeRobot();
+  commands.forEach((cmd, i) => {
+    setTimeout(() => {
+      if (i > 0) document.getElementById('log' + (i - 1)).className = 'log-line past';
+      document.getElementById('log' + i).className = 'log-line active';
+      if (cmd.action === 'move') {
+        rx = Math.max(0, Math.min(4, rx + deltas[dirIdx][0]));
+        ry = Math.max(0, Math.min(4, ry + deltas[dirIdx][1]));
+      } else { dirIdx = (dirIdx + 1) % 4; }
+      placeRobot();
+    }, (i + 1) * 1200);
+  });
+  setTimeout(runSequence, (commands.length + 2) * 1200);
+}
+setTimeout(runSequence, 600);
+</script>
+</body>
+</html>

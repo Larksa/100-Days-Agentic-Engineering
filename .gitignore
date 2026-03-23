@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Student project code (created during sessions)
+projects/*
+!projects/.gitkeep
+
+# Progress tracking (per-student)
+progress.json

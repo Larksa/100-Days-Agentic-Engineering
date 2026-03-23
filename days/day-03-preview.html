@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3: Treasure Island</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: #e94560; }
+  .header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+  .scene { position: relative; background: #16213e; border: 2px solid #0f3460; border-radius: 12px; width: 100%; max-width: 500px; height: 320px; overflow: hidden; }
+  .path { position: absolute; background: #0f3460; border-radius: 4px; }
+  .p1 { left: 40px; top: 250px; width: 120px; height: 8px; }
+  .p2 { left: 152px; top: 150px; width: 8px; height: 108px; }
+  .p3l { left: 80px; top: 142px; width: 80px; height: 8px; }
+  .p3r { left: 160px; top: 142px; width: 80px; height: 8px; }
+  .p4 { left: 80px; top: 60px; width: 8px; height: 90px; }
+  .p5 { left: 80px; top: 52px; width: 100px; height: 8px; }
+  .marker { position: absolute; font-size: 1.5rem; left: 30px; top: 235px; transition: all 0.8s ease; }
+  .choice { position: absolute; font-size: 0.85rem; padding: 0.3rem 0.6rem; background: rgba(233,69,96,0.9); border-radius: 6px; opacity: 0; transition: opacity 0.4s; white-space: nowrap; }
+  .choice.show { opacity: 1; }
+  .c-fork { left: 120px; top: 115px; }
+  .c-cave { left: 130px; top: 30px; }
+  .treasure { position: absolute; font-size: 2.5rem; left: 160px; top: 35px; opacity: 0; transition: opacity 0.5s; }
+  .treasure.show { opacity: 1; }
+  @keyframes sparkle { 0%,100% { text-shadow: 0 0 5px gold; } 50% { text-shadow: 0 0 20px gold, 0 0 40px orange, 0 0 60px gold; } }
+  .sparkle { animation: sparkle 0.6s ease infinite; }
+  .narration { text-align: center; margin-top: 1rem; min-height: 2.5rem; color: #53d769; font-size: 0.95rem; max-width: 500px; opacity: 0; transition: opacity 0.4s; }
+  .narration.show { opacity: 1; }
+  .footer { margin-top: auto; color: #888; font-size: 0.85rem; text-align: center; padding-top: 2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Day 3: Treasure Island</h1>
+    <p>100 Days of Agentic Engineering</p>
+  </div>
+  <div class="scene">
+    <div class="path p1"></div><div class="path p2"></div><div class="path p3l"></div>
+    <div class="path p3r"></div><div class="path p4"></div><div class="path p5"></div>
+    <div class="marker" id="marker">&#x1F9ED;</div>
+    <div class="choice c-fork" id="ch1">Left or Right?</div>
+    <div class="choice c-cave" id="ch2">Wait or Enter?</div>
+    <div class="treasure" id="treasure">&#x1F4B0;</div>
+  </div>
+  <div class="narration" id="narr"></div>
+  <div class="footer">Ready to build this? Go back to Claude Code and let's start!</div>
+<script>
+  const m = document.getElementById("marker"), ch1 = document.getElementById("ch1");
+  const ch2 = document.getElementById("ch2"), tr = document.getElementById("treasure");
+  const narr = document.getElementById("narr");
+  const steps = [
+    { d: 500, fn: () => { narr.textContent = "You arrive at a mysterious island..."; narr.classList.add("show"); } },
+    { d: 1500, fn: () => { m.style.left = "145px"; m.style.top = "235px"; narr.textContent = "Walking along the path..."; } },
+    { d: 2500, fn: () => { m.style.left = "145px"; m.style.top = "135px"; narr.textContent = "You reach a fork in the road!"; } },
+    { d: 3200, fn: () => { ch1.classList.add("show"); } },
+    { d: 4200, fn: () => { ch1.classList.remove("show"); m.style.left = "73px"; narr.textContent = "You choose LEFT..."; } },
+    { d: 5200, fn: () => { m.style.top = "55px"; narr.textContent = "A dark cave appears ahead!"; } },
+    { d: 6000, fn: () => { m.style.left = "110px"; ch2.classList.add("show"); } },
+    { d: 7200, fn: () => { ch2.classList.remove("show"); narr.textContent = "You bravely enter the cave..."; } },
+    { d: 8200, fn: () => { tr.classList.add("show", "sparkle"); narr.textContent = "You found the TREASURE! You win!"; } },
+    { d: 10500, fn: () => { reset(); } }
+  ];
+  function reset() {
+    m.style.left = "30px"; m.style.top = "235px";
+    tr.classList.remove("show", "sparkle"); narr.classList.remove("show"); narr.textContent = "";
+    setTimeout(run, 500);
+  }
+  function run() { steps.forEach(s => setTimeout(s.fn, s.d)); }
+  run();
+</script>
+</body>
+</html>

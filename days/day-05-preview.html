@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5: Password Generator</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+  header { text-align: center; padding: 2rem 1rem 1rem; z-index: 10; }
+  header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: #e94560; }
+  header p { color: #888; font-size: clamp(0.8rem, 2vw, 1rem); margin-top: 0.3rem; }
+  .stage { flex: 1; width: 100%; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; }
+  .rain-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .drop { position: absolute; color: #0f3460; font-size: 1.2rem; opacity: 0; animation: fall 2.5s linear infinite; }
+  @keyframes fall { 0% { transform: translateY(-20px); opacity: 0.8; } 100% { transform: translateY(100vh); opacity: 0; } }
+  .password-box { z-index: 5; background: #16213e; border: 2px solid #0f3460; border-radius: 8px; padding: 1rem 2rem; font-size: clamp(1.5rem, 4vw, 2.5rem); letter-spacing: 0.15em; min-width: 280px; text-align: center; min-height: 3.5rem; }
+  .char { display: inline-block; opacity: 0; animation: charIn 0.15s forwards; }
+  @keyframes charIn { to { opacity: 1; transform: scale(1); } from { opacity: 0; transform: scale(2); } }
+  .meter-wrap { z-index: 5; width: min(80%, 350px); }
+  .meter-label { font-size: 0.9rem; margin-bottom: 0.3rem; min-height: 1.2em; }
+  .meter { height: 12px; background: #16213e; border-radius: 6px; overflow: hidden; border: 1px solid #0f3460; }
+  .meter-fill { height: 100%; width: 0; border-radius: 6px; transition: width 0.4s, background 0.4s; }
+  footer { text-align: center; padding: 1.5rem 1rem; color: #53d769; font-size: clamp(0.8rem, 2vw, 1rem); z-index: 10; }
+</style>
+</head>
+<body>
+<header><h1>Day 5: Password Generator</h1><p>100 Days of Agentic Engineering</p></header>
+<div class="stage">
+  <div class="rain-container" id="rain"></div>
+  <div class="password-box" id="pw"></div>
+  <div class="meter-wrap">
+    <div class="meter-label" id="label"></div>
+    <div class="meter"><div class="meter-fill" id="fill"></div></div>
+  </div>
+</div>
+<footer>Ready to build this? Go back to Claude Code and let's start!</footer>
+<script>
+const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+const rain = document.getElementById('rain');
+// Create rain drops
+for (let i = 0; i < 40; i++) {
+  const d = document.createElement('span');
+  d.className = 'drop';
+  d.textContent = chars[Math.floor(Math.random() * chars.length)];
+  d.style.left = Math.random() * 100 + '%';
+  d.style.animationDelay = Math.random() * 3 + 's';
+  d.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+  rain.appendChild(d);
+}
+const passwords = ['aX7#mK9$pL2!', 'Qz!4rW&8nB0%', 'hT3@yP6*dJ1!'];
+let idx = 0;
+function showPassword() {
+  const pw = passwords[idx % passwords.length]; idx++;
+  const box = document.getElementById('pw');
+  const fill = document.getElementById('fill');
+  const label = document.getElementById('label');
+  box.innerHTML = ''; fill.style.width = '0'; fill.style.background = '#e94560'; label.textContent = '';
+  pw.split('').forEach((c, i) => {
+    setTimeout(() => {
+      const s = document.createElement('span');
+      s.className = 'char'; s.textContent = c; box.appendChild(s);
+      const pct = ((i + 1) / pw.length) * 100;
+      fill.style.width = pct + '%';
+      if (pct < 40) { fill.style.background = '#e94560'; label.textContent = 'Weak'; label.style.color = '#e94560'; }
+      else if (pct < 75) { fill.style.background = '#f5a623'; label.textContent = 'Medium'; label.style.color = '#f5a623'; }
+      else { fill.style.background = '#53d769'; label.textContent = 'Strong!'; label.style.color = '#53d769'; }
+    }, i * 180);
+  });
+  setTimeout(showPassword, pw.length * 180 + 2500);
+}
+setTimeout(showPassword, 1000);
+</script>
+</body>
+</html>

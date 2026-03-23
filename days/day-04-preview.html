@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4: Rock Paper Scissors</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: #e94560; }
+  .header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+  .arena { display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .hand { font-size: clamp(3rem, 10vw, 5rem); min-width: 100px; text-align: center; }
+  @keyframes shake { 0%,100% { transform: translateY(0); } 25% { transform: translateY(-15px); } 75% { transform: translateY(10px); } }
+  .shaking { animation: shake 0.4s ease infinite; }
+  .vs { font-size: 1.5rem; color: #0f3460; font-weight: bold; }
+  .countdown { font-size: clamp(2rem, 8vw, 3.5rem); color: #e94560; text-align: center; min-height: 4rem; font-weight: bold; }
+  @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.3); } 100% { transform: scale(1); opacity: 1; } }
+  .pop { animation: pop 0.4s ease-out; }
+  .result { font-size: clamp(1.2rem, 4vw, 1.8rem); text-align: center; min-height: 2.5rem; margin: 0.5rem 0; }
+  .win { color: #53d769; }
+  .lose { color: #e94560; }
+  .score { background: #16213e; border: 2px solid #0f3460; border-radius: 10px; padding: 1rem 2rem; text-align: center; font-size: 1.2rem; margin-top: 0.5rem; }
+  .score span { font-weight: bold; }
+  .s-you { color: #53d769; }
+  .s-cpu { color: #e94560; }
+  .labels { display: flex; justify-content: center; gap: 2rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .labels span { color: #888; font-size: 0.9rem; min-width: 100px; text-align: center; }
+  .footer { margin-top: auto; color: #888; font-size: 0.85rem; text-align: center; padding-top: 2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Day 4: Rock Paper Scissors</h1>
+    <p>100 Days of Agentic Engineering</p>
+  </div>
+  <div class="countdown" id="cd"></div>
+  <div class="arena">
+    <div class="hand" id="h1">&#x270A;</div>
+    <div class="vs">VS</div>
+    <div class="hand" id="h2">&#x270A;</div>
+  </div>
+  <div class="labels"><span>You</span><span>Computer</span></div>
+  <div class="result" id="res"></div>
+  <div class="score">You: <span class="s-you" id="sy">0</span> &mdash; Computer: <span class="s-cpu" id="sc">0</span></div>
+  <div class="footer">Ready to build this? Go back to Claude Code and let's start!</div>
+<script>
+  const emoji = { rock: "\u270A", paper: "\u270B", scissors: "\u270C\uFE0F" };
+  const rounds = [
+    { you: "rock", cpu: "scissors", msg: "You Win!", cls: "win" },
+    { you: "paper", cpu: "paper", msg: "Draw!", cls: "" },
+    { you: "scissors", cpu: "rock", msg: "Computer Wins!", cls: "lose" },
+    { you: "paper", cpu: "rock", msg: "You Win!", cls: "win" }
+  ];
+  let ri = 0, sy = 0, sc = 0;
+  const h1 = document.getElementById("h1"), h2 = document.getElementById("h2");
+  const cd = document.getElementById("cd"), res = document.getElementById("res");
+  function playRound() {
+    const r = rounds[ri % rounds.length];
+    res.textContent = ""; res.className = "result";
+    h1.textContent = "\u270A"; h2.textContent = "\u270A";
+    h1.classList.add("shaking"); h2.classList.add("shaking");
+    const nums = ["3...", "2...", "1..."];
+    nums.forEach((n, i) => setTimeout(() => { cd.textContent = n; cd.classList.remove("pop"); void cd.offsetWidth; cd.classList.add("pop"); }, i * 700));
+    setTimeout(() => {
+      cd.textContent = "";
+      h1.classList.remove("shaking"); h2.classList.remove("shaking");
+      h1.textContent = emoji[r.you]; h2.textContent = emoji[r.cpu];
+      h1.classList.add("pop"); h2.classList.add("pop");
+      setTimeout(() => { h1.classList.remove("pop"); h2.classList.remove("pop"); }, 400);
+      setTimeout(() => {
+        res.textContent = r.msg;
+        if (r.cls) res.classList.add(r.cls);
+        if (r.cls === "win") { sy++; document.getElementById("sy").textContent = sy; }
+        if (r.cls === "lose") { sc++; document.getElementById("sc").textContent = sc; }
+      }, 500);
+    }, 2200);
+    ri++;
+    setTimeout(playRound, 4500);
+  }
+  playRound();
+</script>
+</body>
+</html>

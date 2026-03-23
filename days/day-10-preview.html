@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 10: Calculator</title>
+<style>
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: #e94560; }
+  .header p { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+  .calculator { background: #16213e; border: 2px solid #0f3460; border-radius: 16px; width: 100%; max-width: 360px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .display { background: #0d1b2a; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; text-align: right; min-height: 80px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .display .expression { font-size: 1rem; color: #888; min-height: 1.4em; transition: opacity 0.3s; }
+  .display .value { font-size: clamp(2rem, 8vw, 2.8rem); color: #53d769; font-weight: bold; min-height: 1.2em; transition: all 0.3s; font-family: 'Courier New', Courier, monospace; }
+  .display .value.flash { color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.6); }
+  .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+  .btn { background: #1a1a2e; border: 1px solid #0f3460; border-radius: 8px; padding: 0.9rem; font-size: 1.2rem; color: #eee; font-family: 'Courier New', monospace; text-align: center; transition: all 0.2s; }
+  .btn.op { color: #e94560; }
+  .btn.eq { background: #e94560; color: #fff; }
+  .btn.active { background: #e94560; color: #fff; transform: scale(1.08); box-shadow: 0 0 12px rgba(233,69,96,0.5); }
+  .btn.num-active { background: #0f3460; transform: scale(1.05); box-shadow: 0 0 8px rgba(15,52,96,0.6); }
+  .history { width: 100%; max-width: 360px; }
+  .history h3 { color: #888; font-size: 0.85rem; margin-bottom: 0.5rem; }
+  .history-item { background: #16213e; border-radius: 8px; padding: 0.5rem 0.8rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between; opacity: 0; transform: translateY(10px); transition: all 0.4s; font-size: 0.9rem; }
+  .history-item.visible { opacity: 1; transform: translateY(0); }
+  .history-item .expr { color: #888; }
+  .history-item .res { color: #53d769; font-weight: bold; }
+  .footer { margin-top: auto; color: #888; font-size: 0.85rem; text-align: center; padding-top: 2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Day 10: Calculator</h1>
+    <p>100 Days of Agentic Engineering</p>
+  </div>
+  <div class="calculator">
+    <div class="display">
+      <div class="expression" id="expr"></div>
+      <div class="value" id="val">0</div>
+    </div>
+    <div class="buttons" id="buttons">
+      <div class="btn">7</div><div class="btn">8</div><div class="btn">9</div><div class="btn op">/</div>
+      <div class="btn">4</div><div class="btn">5</div><div class="btn">6</div><div class="btn op">&times;</div>
+      <div class="btn">1</div><div class="btn">2</div><div class="btn">3</div><div class="btn op">-</div>
+      <div class="btn">0</div><div class="btn">.</div><div class="btn eq">=</div><div class="btn op">+</div>
+    </div>
+  </div>
+  <div class="history">
+    <h3>History</h3>
+    <div class="history-item" id="h0"><span class="expr">15 + 7 =</span><span class="res">22</span></div>
+    <div class="history-item" id="h1"><span class="expr">22 &times; 3 =</span><span class="res">66</span></div>
+  </div>
+  <div class="footer">Ready to build this? Go back to Claude Code and let's start!</div>
+<script>
+  const expr = document.getElementById('expr');
+  const val = document.getElementById('val');
+  const btns = document.querySelectorAll('.btn');
+  const h0 = document.getElementById('h0');
+  const h1 = document.getElementById('h1');
+
+  function findBtn(text) {
+    for (const b of btns) if (b.textContent.trim() === text) return b;
+    return null;
+  }
+  function pressBtn(text, cls) {
+    const b = findBtn(text);
+    if (b) { b.classList.add(cls); setTimeout(() => b.classList.remove(cls), 400); }
+  }
+  function setVal(v, flash) {
+    val.textContent = v;
+    if (flash) { val.classList.add('flash'); setTimeout(() => val.classList.remove('flash'), 600); }
+  }
+
+  function run() {
+    // Reset
+    val.textContent = '0'; expr.textContent = '';
+    h0.classList.remove('visible'); h1.classList.remove('visible');
+    val.classList.remove('flash');
+
+    const steps = [
+      // Type 1, 5
+      [400, () => { pressBtn('1','num-active'); setVal('1'); }],
+      [800, () => { pressBtn('5','num-active'); setVal('15'); }],
+      // Press +
+      [1400, () => { pressBtn('+','active'); expr.textContent = '15 +'; setVal('15'); }],
+      // Type 7
+      [2000, () => { pressBtn('7','num-active'); setVal('7'); }],
+      // Press =
+      [2700, () => { pressBtn('=','active'); expr.textContent = '15 + 7 ='; setVal('22', true); }],
+      // History item 1
+      [3400, () => { h0.classList.add('visible'); }],
+      // Press x
+      [4200, () => { pressBtn('\u00d7','active'); expr.textContent = '22 \u00d7'; setVal('22'); }],
+      // Type 3
+      [4800, () => { pressBtn('3','num-active'); setVal('3'); }],
+      // Press =
+      [5500, () => { pressBtn('=','active'); expr.textContent = '22 \u00d7 3 ='; setVal('66', true); }],
+      // History item 2
+      [6200, () => { h1.classList.add('visible'); }],
+    ];
+
+    steps.forEach(([delay, fn]) => setTimeout(fn, delay));
+    setTimeout(run, 9000);
+  }
+  run();
+</script>
+</body>
+</html>
