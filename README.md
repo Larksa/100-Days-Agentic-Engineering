@@ -53,9 +53,10 @@ bash setup.sh
 
 ### Step 3: Start Learning
 
-In your Terminal, make sure you're in the course folder, then type:
+In your Terminal, go into the course folder and launch Claude Code:
 
 ```
+cd 100-Days-Agentic-Engineering
 claude
 ```
 
