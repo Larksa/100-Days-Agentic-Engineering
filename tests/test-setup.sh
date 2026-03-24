@@ -5,7 +5,7 @@
 set -e
 
 # Always restore admin write permissions, even if test is interrupted
-trap 'chmod -R u+w days/ CLAUDE.md README.md 2>/dev/null' EXIT
+trap 'chmod -R u+w days/ blocks/ CLAUDE.md README.md 2>/dev/null' EXIT
 
 PASS=0
 FAIL=0
@@ -66,6 +66,10 @@ check "README.md is read-only" "test ! -w README.md"
 check "Cannot write to days/day-01.md" "echo test >> days/day-01.md" "should_fail"
 check "Cannot write to CLAUDE.md" "echo test >> CLAUDE.md" "should_fail"
 
+# ─── Test blocks are read-only ──────────────────────────────
+check "blocks/ is read-only" "test ! -w blocks/staged-build.md"
+check "Cannot write to blocks/staged-build.md" "echo test >> blocks/staged-build.md" "should_fail"
+
 # ─── Test student files are writable ────────────────────────
 check "projects/ directory exists" "test -d projects"
 check "progress.json exists" "test -f progress.json"
@@ -81,7 +85,7 @@ check "Can create files in projects/" "test -f projects/test-project/test.txt"
 rm -rf projects/test-project
 
 # ─── Restore write permissions for admin ────────────────────
-chmod -R u+w days/ CLAUDE.md README.md
+chmod -R u+w days/ blocks/ CLAUDE.md README.md
 
 # ─── Report ─────────────────────────────────────────────────
 echo ""
