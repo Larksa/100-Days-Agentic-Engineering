@@ -8,6 +8,7 @@ set -e
 # Always re-lock course files on exit, even if the script fails partway through
 relock_files() {
     chmod -R a-w days/ 2>/dev/null || true
+    chmod -R a-w blocks/ 2>/dev/null || true
     chmod a-w CLAUDE.md 2>/dev/null || true
     chmod a-w README.md 2>/dev/null || true
     chmod a-w setup.sh 2>/dev/null || true
@@ -47,6 +48,7 @@ fi
 
 # Temporarily make course files writable so git can update them
 chmod -R u+w days/ 2>/dev/null || true
+chmod -R u+w blocks/ 2>/dev/null || true
 chmod u+w CLAUDE.md 2>/dev/null || true
 chmod u+w README.md 2>/dev/null || true
 chmod u+w setup.sh 2>/dev/null || true
@@ -54,7 +56,7 @@ chmod u+w update-course.sh 2>/dev/null || true
 
 # Reset any accidental local changes to course files
 # (shouldn't happen with read-only, but just in case)
-git checkout -- days/ CLAUDE.md README.md 2>/dev/null || true
+git checkout -- days/ blocks/ CLAUDE.md README.md 2>/dev/null || true
 
 # Pull latest changes
 echo "  Downloading updates..."
