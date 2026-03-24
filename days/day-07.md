@@ -1,3 +1,9 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+---
+
 # Day 07: Hangman
 
 ## What They're Building

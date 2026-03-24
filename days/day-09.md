@@ -1,3 +1,9 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+---
+
 # Day 09: Secret Auction
 
 ## What They're Building

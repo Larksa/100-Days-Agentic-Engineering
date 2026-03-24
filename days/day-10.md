@@ -1,3 +1,9 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+---
+
 # Day 10: Calculator App
 
 ## What They're Building

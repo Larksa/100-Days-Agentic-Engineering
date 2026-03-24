@@ -1,3 +1,10 @@
+---
+blocks:
+  - staged-build
+  - mindset-moments
+  - bold-iteration
+---
+
 # Day 03: Treasure Island Game
 
 ## What They're Building

@@ -1,3 +1,10 @@
+---
+blocks:
+  - staged-build
+  - mindset-moments
+  - bold-iteration
+---
+
 # Day 04: Rock Paper Scissors
 
 ## What They're Building

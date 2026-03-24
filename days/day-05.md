@@ -1,3 +1,10 @@
+---
+blocks:
+  - staged-build
+  - mindset-moments
+  - bold-iteration
+---
+
 # Day 05: Password Generator
 
 ## What They're Building

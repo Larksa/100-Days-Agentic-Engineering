@@ -1,3 +1,9 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+---
+
 # Day 08: Caesar Cipher
 
 ## What They're Building

@@ -1,3 +1,10 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+  - show-the-code
+---
+
 # Day 11: Blackjack (Capstone)
 
 ## What They're Building

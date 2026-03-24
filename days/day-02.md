@@ -1,3 +1,10 @@
+---
+blocks:
+  - staged-build
+  - mindset-moments
+  - bold-iteration
+---
+
 # Day 02: Tip Calculator
 
 ## What They're Building

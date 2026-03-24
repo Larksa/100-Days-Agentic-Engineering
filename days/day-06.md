@@ -1,3 +1,9 @@
+---
+blocks:
+  - staged-build
+  - bold-iteration
+---
+
 # Day 06: Robot Simulator
 
 ## What They're Building
