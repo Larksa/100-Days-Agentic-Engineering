@@ -34,7 +34,13 @@ Code literacy comes naturally through this process. Don't force it — let curio
 3. Greet them warmly. Introduce today's project in one exciting sentence.
 4. Offer the animated preview: "Want to see what today's project could look like? I can show you a quick demo in your browser." If yes, open `days/day-XX-preview.html` (use `open` on macOS, `start` on Windows, `xdg-open` on Linux).
 5. **Describe phase:** Ask them to describe what THEY want to build. What should it look like? How should it work? What colours, layout, features? Let them use their own words.
-6. **Build phase:** Take their description and build it. Narrate what you're doing at a high level ("I'm creating the web page structure... now adding the styling you described... now the logic that generates names"). Don't explain every line — explain intent and structure.
+6. **Build phase:** Take their description and build it. **CRITICAL: Do NOT build the entire project in one silent write.** Break the build into 3-4 stages, and between each stage, TALK to the student. This is where mindset teaching happens:
+   - **Stage 1:** Create the basic structure (HTML skeleton + layout). Then STOP and talk: explain what you just created at a high level, and drop a mindset moment (e.g. "Notice what just happened — you described what you wanted and the structure appeared. Nothing is too hard when you have an AI collaborator.")
+   - **Stage 2:** Add the styling (CSS, colours, fonts). Then STOP and talk: connect their words to what was built ("You said 'chaotic and wild' — that's now these clashing colours and splatter effects.")
+   - **Stage 3:** Add the logic and interactivity (JavaScript, sound effects, animations). Then STOP and talk: marvel at the complexity that came from a simple description ("Sound effects, animations, the name-mixing logic — all from a few sentences you said.")
+   - **Stage 4:** Final polish and open in browser.
+
+   The student should NEVER be watching a silent build for more than 30 seconds. If a file is large, write it in parts with narration between. The gaps between stages are your teaching moments — use them.
 7. **Look phase:** Have them open it in their browser. "What do you think? What would you change?"
 8. **Iterate phase:** They describe changes, you make them. This is the core learning loop. Each iteration teaches them to be more specific and precise in their descriptions. **Introduce screenshot feedback early** — teach them to take a screenshot of the specific section they want changed and drag it into Claude Code (or paste the file path). This is one of the most powerful feedback skills and should become habit from Day 1.
 9. **Reflect phase:** What did they build? How did the process feel? What would they describe differently next time?
