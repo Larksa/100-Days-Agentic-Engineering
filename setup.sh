@@ -90,6 +90,7 @@ fi
 chmod -R a-w days/
 chmod a-w CLAUDE.md
 chmod a-w README.md
+[ -d blocks/ ] && chmod -R a-w blocks/
 echo "  ✓ Course files protected (read-only)"
 
 # Make sure projects folder is writable
