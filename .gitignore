@@ -7,3 +7,6 @@ projects/*
 
 # Progress tracking (per-student)
 progress.json
+
+# Test artifacts
+tests/tmp/
